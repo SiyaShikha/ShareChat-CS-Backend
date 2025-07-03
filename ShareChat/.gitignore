@@ -1,0 +1,12 @@
+**/bin/
+**/obj/
+**/packages/
+.idea/
+
+*.tmp
+*.log
+*.obj
+*.dll
+*.exe
+
+**/logs/
