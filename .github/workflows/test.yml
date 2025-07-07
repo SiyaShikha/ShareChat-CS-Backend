@@ -12,7 +12,7 @@ jobs:
 
     defaults:
       run:
-        working-directory: ../../sharechat-ui/
+        working-directory: sharechat-ui
 
     steps:
       - name: Checkout repository
