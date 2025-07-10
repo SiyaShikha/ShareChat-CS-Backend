@@ -7,13 +7,19 @@ namespace ShareChat.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class UserController(UserService service) : ControllerBase
+public class UserController : ControllerBase
 {
+  private readonly IUserService _service;
+
+  public UserController(IUserService service)
+  {
+    _service = service;
+  }
   
   [HttpPost("register")]
   public async Task<IActionResult> Register([FromBody] RegisterDto dto)
   {
-    if (!await service.Register(dto))
+    if (!await _service.Register(dto))
     {
       return BadRequest("Username already exists.");
     }
@@ -24,15 +30,10 @@ public class UserController(UserService service) : ControllerBase
   [HttpPost("login")]
   public async Task<IActionResult> Login([FromBody] LoginDto dto)
   {
-    if (!await service.Login(dto))
-    {
+    var token = await _service.Login(dto);
+    if (token == null)
       return BadRequest("Username or password is incorrect.");
-    }
 
-    return Ok("User logged in successfully.");
-    
-    // TODO: Return JWT token in next step
+    return Ok(new { token });
   }
-  
-  
 }

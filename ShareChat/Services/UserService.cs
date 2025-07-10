@@ -1,5 +1,8 @@
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
+using Microsoft.IdentityModel.Tokens;
 using ShareChat.Models;
 using ShareChat.DTOs;
 
@@ -7,11 +10,19 @@ using ShareChat.Repositories;
 
 namespace ShareChat.Services;
 
-public class UserService(IUserRepository repository)
+public class UserService : IUserService
 {
+  private readonly IUserRepository _repository;
+  private readonly IConfiguration _config;
+
+  public UserService(IUserRepository repository, IConfiguration config)
+  {
+    _repository = repository;
+    _config = config;
+  }
   public async Task<bool> Register(RegisterDto dto)
   {
-    if (await repository.IsUserRegistered(dto.Username))
+    if (await _repository.IsUserRegistered(dto.Username))
     {
       return false;
     }
@@ -22,21 +33,37 @@ public class UserService(IUserRepository repository)
       PasswordHash = ComputeHash(dto.Password)
     };
 
-    await repository.AddUser(user);
+    await _repository.AddUser(user);
     return true;
   }
   
-  public async Task<bool> Login(LoginDto dto)
+  public async Task<string?> Login(LoginDto dto)
   {
-    var registeredUser = await repository.FindUser(dto.Username);
-    if (registeredUser == null)
-    {
-      return false;
-    }
+    var user = await _repository.FindUser(dto.Username);
+    if (user == null) return null;
 
     var hashedInput = ComputeHash(dto.Password);
-    return registeredUser.PasswordHash == hashedInput;
-    // TODO: Return JWT token in next step
+    if (user.PasswordHash != hashedInput) return null;
+
+    // Create JWT Token
+    var claims = new[]
+    {
+      new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+      new Claim(ClaimTypes.Name, user.Username)
+    };
+
+    var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]!));
+    var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+    var token = new JwtSecurityToken(
+      issuer: _config["Jwt:Issuer"],
+      audience: _config["Jwt:Audience"],
+      claims: claims,
+      expires: DateTime.Now.AddHours(1),
+      signingCredentials: creds
+    );
+
+    return new JwtSecurityTokenHandler().WriteToken(token);
   }
   
   private string ComputeHash(string password)
