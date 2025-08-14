@@ -35,4 +35,10 @@ public class ChatRoomRepository : IChatRoomRepository
     _dbContext.ChatRooms.Remove(room);
     await _dbContext.SaveChangesAsync();
   }
+
+  public async Task UpdateChatRoom(ChatRoom room)
+  {
+    _dbContext.ChatRooms.Update(room);
+    await _dbContext.SaveChangesAsync();
+  }
 }

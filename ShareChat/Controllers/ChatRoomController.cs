@@ -1,7 +1,9 @@
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ShareChat.DTOs;
 using ShareChat.Services;
+using ShareChat.Utils;
 
 namespace ShareChat.Controllers;
 
@@ -53,5 +55,21 @@ public class ChatRoomController: ControllerBase
   {
     await _service.DeleteChatRoom(id);
     return NoContent();
+  }
+  
+  [HttpPost("{id:int}/join")]
+  public async Task<IActionResult> JoinRoom(int id)
+  {
+    var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
+    var result = await _service.JoinChatRoom(id, userId);
+
+    return result switch
+    {
+      JoinRoomResult.NotFound => NotFound(new { message = "Chat room not found" }),
+      JoinRoomResult.AlreadyJoined => BadRequest(new { message = "User already joined this chat room" }),
+      JoinRoomResult.Success => Ok(new { message = "Joined chat room successfully" }),
+      _ => StatusCode(500, new { message = "An unexpected error occurred" })
+    };
   }
 }

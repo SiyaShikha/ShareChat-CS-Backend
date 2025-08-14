@@ -8,4 +8,5 @@ public interface IChatRoomRepository
   Task<ChatRoom?> GetChatRoomById(int id);
   Task<ChatRoom> AddChatRoom(ChatRoom room);
   Task DeleteChatRoom(ChatRoom room);
+  Task UpdateChatRoom(ChatRoom room);
 }

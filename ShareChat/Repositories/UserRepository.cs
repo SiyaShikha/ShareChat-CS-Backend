@@ -23,4 +23,9 @@ public class UserRepository(ChatDbContext dbContext) : IUserRepository
     _dbContext.Users.Add(user);
     await _dbContext.SaveChangesAsync();
   }
+  
+  public async Task<User?> GetUserById(int userId)
+  {
+    return await _dbContext.Users.FindAsync(userId);
+  }
 }
