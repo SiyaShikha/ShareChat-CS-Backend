@@ -32,6 +32,7 @@ public class MessageService : IMessageService
       Content = message.Content,
       Timestamp = message.Timestamp,
       UserId = message.UserId,
+      UserName = message.User.Username,
     }).ToList();
     return res;
   }
@@ -60,6 +61,7 @@ public class MessageService : IMessageService
       Content = message.Content,
       Timestamp = message.Timestamp,
       UserId = message.UserId,
+      UserName = message.User.Username,
     };
   }
 }
