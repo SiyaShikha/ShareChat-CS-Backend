@@ -5,6 +5,6 @@ namespace ShareChat.Services;
 
 public interface IMessageService
 {
-  Task<List<Message>> GetMessagesByRoomId(int roomId);
-  Task<Message> CreateMessage(int roomId, int userId, MessageDto dto);
+  Task<List<MessageResponseDto>> GetMessagesByRoomId(int roomId);
+  Task<MessageResponseDto> CreateMessage(int roomId, int userId, MessageDto dto);
 }

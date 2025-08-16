@@ -6,29 +6,60 @@ namespace ShareChat.Services;
 
 public class MessageService : IMessageService
 {
-  private readonly IMessageRepository _messageRepo;
+  private readonly IMessageRepository _messageRepository;
+  private readonly IChatRoomRepository _chatRoomRepository;
+  private readonly IUserRepository _userRepository;
 
-  public MessageService(IMessageRepository messageRepo)
+  public MessageService(
+    IMessageRepository messageRepository,
+    IChatRoomRepository chatRoomRepository,
+    IUserRepository userRepository)
   {
-    _messageRepo = messageRepo;
+    _messageRepository = messageRepository;
+    _chatRoomRepository = chatRoomRepository;
+    _userRepository = userRepository;
   }
 
-  public async Task<List<Message>> GetMessagesByRoomId(int roomId)
+  public async Task<List<MessageResponseDto>> GetMessagesByRoomId(int roomId)
   {
-    return await _messageRepo.GetMessagesByRoomId(roomId);
+    var room = await _chatRoomRepository.GetChatRoomById(roomId);
+    if (room == null) throw new Exception("Chat room not found");
+
+    var messages = await _messageRepository.GetMessagesByRoomId(roomId);
+    var res = messages.Select((message) => new MessageResponseDto
+    {
+      Id = message.Id,
+      Content = message.Content,
+      Timestamp = message.Timestamp,
+      UserId = message.UserId,
+    }).ToList();
+    return res;
   }
 
-  public async Task<Message> CreateMessage(int roomId, int userId, MessageDto dto)
+  public async Task<MessageResponseDto> CreateMessage(int roomId, int userId, MessageDto dto)
   {
+    var room = await _chatRoomRepository.GetChatRoomById(roomId);
+    if (room == null) throw new Exception("Chat room not found");
+
+    var user = await _userRepository.GetUserById(userId);
+    if (user == null) throw new Exception("User not found");
+
     var message = new Message
     {
-      ChatRoomId = roomId,
-      UserId = userId,
       Content = dto.Text,
-      Timestamp = DateTime.UtcNow
+      Timestamp = DateTime.UtcNow,
+      ChatRoomId = roomId,
+      UserId = userId
     };
 
-    await _messageRepo.AddMessage(message);
-    return message;
+    await _messageRepository.AddMessage(message);
+   
+    return new MessageResponseDto
+    {
+      Id = message.Id,
+      Content = message.Content,
+      Timestamp = message.Timestamp,
+      UserId = message.UserId,
+    };
   }
 }

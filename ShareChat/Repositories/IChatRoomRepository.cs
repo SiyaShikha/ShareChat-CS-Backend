@@ -9,4 +9,5 @@ public interface IChatRoomRepository
   Task<ChatRoom> AddChatRoom(ChatRoom room);
   Task DeleteChatRoom(ChatRoom room);
   Task UpdateChatRoom(ChatRoom room);
+  Task<bool>IsUserInRoom(int roomId, int userId);
 }

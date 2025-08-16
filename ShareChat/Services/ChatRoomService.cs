@@ -49,7 +49,7 @@ public class ChatRoomService : IChatRoomService
     if (room == null)
       return JoinRoomResult.NotFound;
 
-    if (room.Users.Any(u => u.Id == userId))
+    if (await _chatRoomRepo.IsUserInRoom(roomId, userId))
       return JoinRoomResult.AlreadyJoined;
 
     var user = await _userRepo.GetUserById(userId);
