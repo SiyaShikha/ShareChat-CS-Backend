@@ -22,21 +22,6 @@ namespace ShareChat.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("ChatRoomUser", b =>
-                {
-                    b.Property<int>("ChatRoomsId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("UsersId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("ChatRoomsId", "UsersId");
-
-                    b.HasIndex("UsersId");
-
-                    b.ToTable("ChatRoomUser");
-                });
-
             modelBuilder.Entity("ShareChat.Models.ChatRoom", b =>
                 {
                     b.Property<int>("Id")
@@ -53,6 +38,33 @@ namespace ShareChat.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("ChatRooms");
+                });
+
+            modelBuilder.Entity("ShareChat.Models.ChatRoomUser", b =>
+                {
+                    b.Property<int>("RoomId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsAdmin")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime>("JoinedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("LastSeenAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("RoomId", "UserId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("ChatRoomUsers");
                 });
 
             modelBuilder.Entity("ShareChat.Models.Message", b =>
@@ -109,19 +121,23 @@ namespace ShareChat.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("ChatRoomUser", b =>
+            modelBuilder.Entity("ShareChat.Models.ChatRoomUser", b =>
                 {
-                    b.HasOne("ShareChat.Models.ChatRoom", null)
-                        .WithMany()
-                        .HasForeignKey("ChatRoomsId")
+                    b.HasOne("ShareChat.Models.ChatRoom", "ChatRoom")
+                        .WithMany("ChatRoomUsers")
+                        .HasForeignKey("RoomId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("ShareChat.Models.User", null)
-                        .WithMany()
-                        .HasForeignKey("UsersId")
+                    b.HasOne("ShareChat.Models.User", "User")
+                        .WithMany("ChatRoomUsers")
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("ChatRoom");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("ShareChat.Models.Message", b =>
@@ -145,11 +161,15 @@ namespace ShareChat.Migrations
 
             modelBuilder.Entity("ShareChat.Models.ChatRoom", b =>
                 {
+                    b.Navigation("ChatRoomUsers");
+
                     b.Navigation("Messages");
                 });
 
             modelBuilder.Entity("ShareChat.Models.User", b =>
                 {
+                    b.Navigation("ChatRoomUsers");
+
                     b.Navigation("Messages");
                 });
 #pragma warning restore 612, 618

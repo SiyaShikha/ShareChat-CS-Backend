@@ -50,7 +50,8 @@ public class MessageService : IMessageService
       Content = dto.Text,
       Timestamp = DateTime.UtcNow,
       ChatRoomId = roomId,
-      UserId = userId
+      UserId = userId,
+      User = user
     };
 
     await _messageRepository.AddMessage(message);

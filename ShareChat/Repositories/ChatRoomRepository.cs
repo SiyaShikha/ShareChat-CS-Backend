@@ -20,9 +20,8 @@ public class ChatRoomRepository : IChatRoomRepository
 
   public async Task<ChatRoom?> GetChatRoomById(int id)
   {
-    return await _dbContext.ChatRooms
-      .Include(r => r.Users)
-      .FirstOrDefaultAsync(r => r.Id == id);
+    var chatRoom = await _dbContext.ChatRooms.FirstOrDefaultAsync(x => x.Id == id);
+    return chatRoom;
   }
 
   public async Task<ChatRoom> AddChatRoom(ChatRoom chatRoom)
@@ -48,6 +47,6 @@ public class ChatRoomRepository : IChatRoomRepository
   {
     return await _dbContext.ChatRooms
       .Where(r => r.Id == roomId)
-      .AnyAsync(r => r.Users.Any(u => u.Id == userId));
+      .AnyAsync(r => r.ChatRoomUsers.Any(u => u.RoomId == userId));
   }
 }

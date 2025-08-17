@@ -17,6 +17,7 @@ public class MessageRepository : IMessageRepository
   {
     return await _context.Messages
       .Where(m => m.ChatRoomId == roomId)
+      .Include(m => m.User)
       .OrderBy(m => m.Timestamp)
       .ToListAsync();
   }

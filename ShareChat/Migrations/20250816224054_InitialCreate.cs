@@ -40,24 +40,28 @@ namespace ShareChat.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "ChatRoomUser",
+                name: "ChatRoomUsers",
                 columns: table => new
                 {
-                    ChatRoomsId = table.Column<int>(type: "integer", nullable: false),
-                    UsersId = table.Column<int>(type: "integer", nullable: false)
+                    RoomId = table.Column<int>(type: "integer", nullable: false),
+                    UserId = table.Column<int>(type: "integer", nullable: false),
+                    JoinedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    LastSeenAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    IsAdmin = table.Column<bool>(type: "boolean", nullable: false),
+                    IsActive = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ChatRoomUser", x => new { x.ChatRoomsId, x.UsersId });
+                    table.PrimaryKey("PK_ChatRoomUsers", x => new { x.RoomId, x.UserId });
                     table.ForeignKey(
-                        name: "FK_ChatRoomUser_ChatRooms_ChatRoomsId",
-                        column: x => x.ChatRoomsId,
+                        name: "FK_ChatRoomUsers_ChatRooms_RoomId",
+                        column: x => x.RoomId,
                         principalTable: "ChatRooms",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_ChatRoomUser_Users_UsersId",
-                        column: x => x.UsersId,
+                        name: "FK_ChatRoomUsers_Users_UserId",
+                        column: x => x.UserId,
                         principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -92,9 +96,9 @@ namespace ShareChat.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_ChatRoomUser_UsersId",
-                table: "ChatRoomUser",
-                column: "UsersId");
+                name: "IX_ChatRoomUsers_UserId",
+                table: "ChatRoomUsers",
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Messages_ChatRoomId",
@@ -111,7 +115,7 @@ namespace ShareChat.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "ChatRoomUser");
+                name: "ChatRoomUsers");
 
             migrationBuilder.DropTable(
                 name: "Messages");

@@ -14,6 +14,6 @@ public class User
   [MaxLength(50)]
   public string PasswordHash { get; set; } = string.Empty;
 
-  public ICollection<ChatRoom> ChatRooms { get; set; } = new List<ChatRoom>();
+  public ICollection<ChatRoomUser> ChatRoomUsers { get; set; } = new List<ChatRoomUser>();
   public ICollection<Message> Messages { get; set; } = new List<Message>();
 }
