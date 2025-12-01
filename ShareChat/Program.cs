@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using ShareChat.Data;
+using ShareChat.Hubs;
 using ShareChat.Repositories;
 using ShareChat.Services;
 
@@ -12,6 +13,7 @@ builder.Services.AddDbContext<ChatDbContext>(options =>
   options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddControllers();
+builder.Services.AddSignalR();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IChatRoomService, ChatRoomService>();
@@ -26,7 +28,8 @@ builder.Services.AddCors(options =>
     policy
       .WithOrigins("http://localhost:5173","https://share-chat-cs-frontend.vercel.app")
       .AllowAnyHeader()
-      .AllowAnyMethod();
+      .AllowAnyMethod()
+      .AllowCredentials();
   });
 });
 
@@ -56,5 +59,6 @@ app.UseCors("AllowFrontend");
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
+app.MapHub<MessageHub>("/messagehub");
 
 app.Run();
