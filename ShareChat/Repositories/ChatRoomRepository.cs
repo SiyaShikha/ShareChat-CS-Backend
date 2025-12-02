@@ -43,10 +43,10 @@ public class ChatRoomRepository : IChatRoomRepository
     await _dbContext.SaveChangesAsync();
   }
   
-  public async Task<bool> IsUserInRoom(int roomId, int userId)
+  public async Task<bool> IsUserInRoom(int roomId, int userId)   
   {
     return await _dbContext.ChatRooms
       .Where(r => r.Id == roomId)
-      .AnyAsync(r => r.ChatRoomUsers.Any(u => u.RoomId == userId));
+      .AnyAsync(r => r.Users.Any(u => u.Id == userId));
   }
 }

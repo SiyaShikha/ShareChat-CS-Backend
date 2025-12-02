@@ -39,6 +39,30 @@ var keyBytes = Encoding.UTF8.GetBytes(jwtKey!);
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
   .AddJwtBearer(options =>
   {
+    options.Events = new JwtBearerEvents
+    {
+      OnMessageReceived = context =>
+      {
+        // Read JWT from Cookie (for normal API requests)
+        if (context.Request.Cookies.ContainsKey("authToken"))
+        {
+          context.Token = context.Request.Cookies["authToken"];
+        }
+
+        // Support SignalR WebSocket token via query string
+        var accessToken = context.Request.Query["access_token"];
+        var path = context.HttpContext.Request.Path;
+
+        if (!string.IsNullOrEmpty(accessToken) &&
+            path.StartsWithSegments("/messagehub"))
+        {
+          context.Token = accessToken;
+        }
+
+        return Task.CompletedTask;
+      }
+    };
+
     options.TokenValidationParameters = new TokenValidationParameters
     {
       ValidateIssuer = true,
@@ -51,10 +75,12 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     };
   });
 
+
 builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
+app.UseHttpsRedirection();
 app.UseCors("AllowFrontend");
 app.UseAuthentication();
 app.UseAuthorization();

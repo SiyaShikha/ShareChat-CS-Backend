@@ -55,19 +55,7 @@ public class ChatRoomService : IChatRoomService
     var user = await _userRepo.GetUserById(userId);
     if (user == null)
       return JoinRoomResult.NotFound;
-
-    var chatRoomUser = new ChatRoomUser
-    {
-      RoomId = roomId,
-      UserId = userId,
-      JoinedAt = DateTime.UtcNow,
-      IsAdmin = false,
-      IsActive = false,
-      ChatRoom = room,
-      User = user
-    };
     
-    room.ChatRoomUsers.Add(chatRoomUser);
     await _chatRoomRepo.UpdateChatRoom(room);
 
     return JoinRoomResult.Success;

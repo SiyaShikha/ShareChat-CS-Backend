@@ -33,7 +33,18 @@ public class UserController : ControllerBase
     var token = await _service.Login(dto);
     if (token == null)
       return BadRequest("Username or password is incorrect.");
+    
+    Console.WriteLine($">>>>>>>>{token}");
 
-    return Ok(new { token });
+    Response.Cookies.Append("authToken", token, new CookieOptions
+    {
+      HttpOnly = true,
+      Secure = true,
+      SameSite = SameSiteMode.None,
+      Expires = DateTime.UtcNow.AddDays(7),
+      Path = "/"
+    });
+
+    return Ok(new {message = "Successfully logged in!"});
   }
 }

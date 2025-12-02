@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Microsoft.AspNetCore.SignalR;
 
 namespace ShareChat.Hubs;
@@ -31,9 +32,10 @@ public class MessageHub : Hub
     await Clients.Group($"room-{roomId}")
       .SendAsync("ReceiveMessage", new
       {
-        Text = text,
-        RoomId = roomId,
-        Timestamp = DateTime.UtcNow
+        content = text,
+        chatRoomId = roomId,
+        userId = Context.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value,
+        timestamp = DateTime.UtcNow
       });
   }
 }

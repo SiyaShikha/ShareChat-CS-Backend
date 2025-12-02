@@ -10,6 +10,6 @@ public class ChatRoom
   [MaxLength(50)]
   public string Name { get; set; } = string.Empty;
   
-  public ICollection<ChatRoomUser> ChatRoomUsers { get; set; } = new List<ChatRoomUser>();
   public ICollection<Message> Messages { get; set; } = new List<Message>();
+  public ICollection<User> Users { get; set; } = new List<User>();
 }
