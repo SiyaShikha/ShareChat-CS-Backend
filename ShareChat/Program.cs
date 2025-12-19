@@ -21,12 +21,14 @@ builder.Services.AddScoped<IChatRoomRepository, ChatRoomRepository>();
 builder.Services.AddScoped<IMessageRepository, MessageRepository>();
 builder.Services.AddScoped<IMessageService, MessageService>();
 
+var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>();
+
 builder.Services.AddCors(options =>
 {
-  options.AddPolicy("AllowFrontend", policy =>
+  options.AddPolicy("CorsPolicy", policy =>
   {
     policy
-      .WithOrigins("http://localhost:5173","https://share-chat-cs-frontend.vercel.app")
+      .WithOrigins(allowedOrigins!)
       .AllowAnyHeader()
       .AllowAnyMethod()
       .AllowCredentials();
@@ -81,10 +83,13 @@ builder.Services.AddAuthorization();
 var app = builder.Build();
 
 app.UseHttpsRedirection();
-app.UseCors("AllowFrontend");
+app.UseRouting();
+app.UseCors("CorsPolicy");
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 app.MapHub<MessageHub>("/messagehub");
+
+Console.WriteLine($">>>>>{app.Environment.EnvironmentName}");
 
 app.Run();
