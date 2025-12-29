@@ -12,7 +12,7 @@ using ShareChat.Data;
 namespace ShareChat.Migrations
 {
     [DbContext(typeof(ChatDbContext))]
-    [Migration("20251202054005_InitialCreate")]
+    [Migration("20251229160904_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
